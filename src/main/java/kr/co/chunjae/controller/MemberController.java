@@ -60,6 +60,7 @@ public class MemberController {
         return "list";
 
     }
+
     // /member?id=1
     @GetMapping
     public String findById(@RequestParam("id") Long id, Model model) { // 데이터를 담기위해 Model 사용
@@ -67,5 +68,54 @@ public class MemberController {
         MemberDTO memberDTO = memberService.findById(id); // id값을 넘기고 DTO 객체로 받아옴
         model.addAttribute("member", memberDTO); // 받아온 값을
         return "detail"; // detail.jsp로 출력
+    }
+
+    @GetMapping(value = "/delete")
+    // 쿼리스트링으로 받으므로 RequestParam
+    public String delete(@RequestParam("id") Long id) {
+        log.info(id);
+        memberService.delete(id); // 삭제처리 수행 후
+        // redirect 뒤에는 jsp 이름이 아닌 주소값이 와야함.
+        // 삭제되고 새로운 목록을 보여주기 위해 redirect를 사용함.
+        return "redirect:/member/"; // 리스트 재요청
+    }
+
+    // 수정 화면 요청
+    // 누구의 정보를 수정할 것인지 알아야 함
+    // 세션에 로그인 정보가 담겨있음
+    // 수정화면이라 Form이 들어감
+    @GetMapping(value = "/update")
+    public String updateForm(HttpSession session, Model model) { // 로그인한 정보 -> session.
+        // 세션에 저장된 이메일 가져오기
+        // Object(session.getAttribure)를 String으로 형변환
+        String loginEmail = (String) session.getAttribute("loginEmail"); // loginEmail parameter 가져옴.
+        // loginEmail을 DB로 부터 조회하고 DTO로 가져온 뒤
+        MemberDTO memberDTO = memberService.findByMemberEmail(loginEmail);
+        model.addAttribute("member", memberDTO);
+        return "update"; // update.jsp
+
+    }
+
+    @PostMapping(value = "/update")
+    public String update(@ModelAttribute MemberDTO memberDTO) {
+       boolean result = memberService.update(memberDTO);
+        if (result) {
+            // 상세주소. DTO에서 id값을 받아오는 것을 요청.
+            return "redirect:/member?id=" + memberDTO.getId(); // 성공시
+        } else {
+            return "index"; // 실패시
+        }
+    }
+
+    @PostMapping(value = "/email-check")
+    public @ResponseBody String emailCheck(@RequestParam("memberEmail") String memberEmail) {
+        System.out.println("memberEmail : " + memberEmail);
+        String checkResult = memberService.emailCheck(memberEmail);
+        return checkResult;
+    }
+
+    @GetMapping("/logout")
+    public String logout(Model model) {
+        return "index";
     }
 }

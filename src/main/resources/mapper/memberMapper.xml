@@ -25,4 +25,22 @@
         FROM member_table
         WHERE id = #{id}
     </select>
+
+    <delete id="delete"  parameterType="Long" >
+        DELETE
+        FROM member_table
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findByMemberEmail"  parameterType="String" resultType="member">
+        SELECT id, memberEmail, memberPassword, memberName, memberAge, memberMobile
+        FROM member_table
+        WHERE memberEmail= #{loginEmail}
+    </select>
+
+    <update id="update"  parameterType="member" >
+        UPDATE member_table
+        SET memberAge = #{memberAge}, memberMobile = #{memberMobile}
+        WHERE id = #{id}
+    </update>
 </mapper>

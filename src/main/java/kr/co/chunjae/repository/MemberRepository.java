@@ -33,4 +33,17 @@ public class MemberRepository {
     public MemberDTO findById(Long id) {
         return sql.selectOne("Member.findById",id); // id 요청
     }
+
+    public void delete(Long id) {
+        sql.delete("Member.delete", id);
+    }
+
+    public MemberDTO findByMemberEmail(String loginEmail) {
+        return sql.selectOne("Member.findByMemberEmail", loginEmail);
+    }
+
+    public int update(MemberDTO memberDTO) {
+        // 1 : update 처리 됨 , 0 : update 처리 안됨 그래서 int로 받음
+        return sql.update("Member.update", memberDTO);
+    }
 }
